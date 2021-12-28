@@ -13,7 +13,7 @@ typedef struct punto
 } punto;
 
 void generar_archivo(void);
-void leer_archivo();
+punto *leer_archivo(int *dim);
 void imprimir_puntos(punto *lista, int largo);
 void menu();
 void merge_sort(punto *lista, int inicio, int final, int opcion);
@@ -62,14 +62,14 @@ void menu()
     punto *lista;
     char m;
 
-    printf("\n Inserte el largo de la lista: ");
-    scanf("%i",&largo);
-    lista = calloc(largo,sizeof(punto));
-    for (int i = 0; i < largo; i++)
-    {
-        lista[i].x = rand() % (NMAX);
-        lista[i].y = rand() % (NMAX);
-    }
+    // printf("\n Inserte el largo de la lista: ");
+    // scanf("%i",&largo);
+    // lista = calloc(largo,sizeof(punto));
+    // for (int i = 0; i < largo; i++)
+    // {
+    //     lista[i].x = rand() % (NMAX);
+    //     lista[i].y = rand() % (NMAX);
+    // }
     do
     {
         printf("\nQue desea hacer? ");
@@ -89,7 +89,7 @@ void menu()
             scanf("%c", &m);
             break;
         case 2:
-            leer_archivo();
+            lista = leer_archivo(&largo);
             printf("\nDesea ver tiempo? (s/n)");
             scanf("%c", &m);
             break;
@@ -138,9 +138,9 @@ void generar_archivo(void)
     fprintf(archivo, "%d \n", n);
     for (i = 0; i < n; i++)
     {
-        a = i; // rand() % NMAX;
+        a = rand() % NMAX;
         fprintf(archivo, "%ld ", a);
-        a = i + 1; // rand() % NMAX;
+        a = rand() % NMAX;
         fprintf(archivo, "%ld ", a);
         fprintf(archivo, "\n");
     }
@@ -148,18 +148,38 @@ void generar_archivo(void)
     printf("El archivo esta listo.\n");
 }
 
-void leer_archivo()
+punto *leer_archivo(int *dim)
 {
     punto *p1;
-    long punto;
+    long largo;
+    int i;
     FILE *archivo;
     char nombre_archivo[30];
-    archivo = fopen(nombre_archivo, "r");
-    fscanf(archivo, "%i", NMAX);
-    while (!feof)
+    printf("\nIngrese el nombre del archivo\n ");
+    scanf("%s",&nombre_archivo);
+    if(!nombre_archivo)
     {
-        fscanf(archivo, "%ld", NMAX);
+        printf("\nSaliendo del programa\n");
+        exit(0);
     }
+    printf("\nEscanee el nombre %s\n",nombre_archivo);
+    archivo = fopen(nombre_archivo, "r");
+    if(archivo == NULL){
+        printf("\nSaliendo del programa\n");
+        exit(1);
+    }
+    fread(p1,sizeof(long),largo,archivo);
+    fscanf(archivo, "%i", &largo);
+    p1 = calloc(largo,sizeof(punto));
+    *dim = largo;
+    i = 0;
+    while ( i < largo )
+    {
+        fscanf(archivo, "%ld %ld", &p1[i].x, &p1[i].y);
+        i++;
+    } 
+    fclose(archivo);
+    return p1;
 }
 
 void merge_sort(punto *lista, int inicio, int final, int opcion)
