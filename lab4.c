@@ -18,7 +18,7 @@ void imprimir_puntos(punto *lista, int largo);
 void menu();
 void merge_sort(punto *lista, int inicio, int final, int opcion);
 void merge(punto *lista, int inicio, int medio, int final, int opcion);
-void 
+void item4();
 
 int main()
 {
