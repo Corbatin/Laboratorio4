@@ -1,4 +1,11 @@
 
+// Nombres: Alvaro Soto Albornoz - Benjamín Melis Guerra
+// Nombre Profesora: Nicolas Thériault
+// IDE: Visual Studio Code 1.62.3
+// SO: Windows 10
+// Fecha: [REDACTED] de Enero - 2021
+// Este programa genera dos matrices de un orden dado por el usuario y realiza multiplicaciones con dos algoritmos distintos, el algoritmo clasico y la multiplicacion de Strassen
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -10,6 +17,7 @@ typedef struct punto
 {
     long x;
     long y;
+    //struct punto *sig;
 } punto;
 
 void generar_archivo(void);
@@ -18,7 +26,8 @@ void imprimir_puntos(punto *lista, int largo);
 void menu();
 void merge_sort(punto *lista, int inicio, int final, int opcion);
 void merge(punto *lista, int inicio, int medio, int final, int opcion);
-void item4();
+void lista_enlazada(punto *lista, int inicio, int final, int opcion);
+void sublistado(punto *lista, int largo, int coti_x, int coti_y, int cots_x, int cots_y);
 
 int main()
 {
@@ -52,13 +61,13 @@ void imprimir_puntos(punto *lista, int largo)
 {
     for (int i = 0; i < largo; i++)
     {
-        printf("\nPunto%i : %ld %ld", i + 1, lista[i].x, lista[i].y);
+        printf("\nPunto %i : %ld %ld", i + 1, lista[i].x, lista[i].y);
     }
 }
 
 void menu()
 {
-    int op, el, largo;
+    int op, el, largo, coti_x, coti_y, cots_x, cots_y;
     punto *lista;
     char m;
 
@@ -77,7 +86,7 @@ void menu()
         printf("\n 2)Leer archivo con puntos.");
         printf("\n 3)Ordenar los puntos segun el valor de sus coordenadas x (S/N)");
         printf("\n 4)Ordenar los puntos segun el valor de sus coordenadas y (S/N)");
-        printf("\n Item 4.");
+        printf("\n 5)Sub listado con cotas: ");
         printf("\n 0)Salir del programa.");
         printf("\n Opcion: ");
         scanf("%i", &op);
@@ -111,12 +120,26 @@ void menu()
             // printf("\nDesea ver tiempo? (s/n)");
             // scanf("%c", &m);
             break;
+        case 5:
+            merge_sort(lista,0 ,largo - 1, 1);
+            printf("\nIngrese cota inferior de X: ");
+            scanf("%i", &coti_x);
+            printf("\nIngrese cota inferior de Y: ");
+            scanf("%i", &coti_y);
+            printf("\nIngrese cota superior de X: ");
+            scanf("%i", &cots_x);
+            printf("\nIngrese cota superior de Y: ");
+            scanf("%i", &cots_y);
+            sublistado(lista, largo, coti_x, coti_y, cots_x, cots_y);
+
+            break;
         case 0:
             break;
         default:
             break;
         }
     } while (op);
+    free(lista);
 }
 
 void generar_archivo(void)
@@ -156,28 +179,29 @@ punto *leer_archivo(int *dim)
     FILE *archivo;
     char nombre_archivo[30];
     printf("\nIngrese el nombre del archivo\n ");
-    scanf("%s",&nombre_archivo);
-    if(!nombre_archivo)
+    scanf("%s", &nombre_archivo);
+    if (!nombre_archivo)
     {
         printf("\nSaliendo del programa\n");
         exit(0);
     }
-    printf("\nEscanee el nombre %s\n",nombre_archivo);
+    printf("\nEscanee el nombre %s\n", nombre_archivo);
     archivo = fopen(nombre_archivo, "r");
-    if(archivo == NULL){
+    if (archivo == NULL)
+    {
         printf("\nSaliendo del programa\n");
         exit(1);
     }
-    fread(p1,sizeof(long),largo,archivo);
+    fread(p1, sizeof(long), largo, archivo);
     fscanf(archivo, "%i", &largo);
-    p1 = calloc(largo,sizeof(punto));
+    p1 = calloc(largo, sizeof(punto));
     *dim = largo;
     i = 0;
-    while ( i < largo )
+    while (i < largo)
     {
         fscanf(archivo, "%ld %ld", &p1[i].x, &p1[i].y);
         i++;
-    } 
+    }
     fclose(archivo);
     return p1;
 }
@@ -272,4 +296,27 @@ void merge(punto *lista, int inicio, int medio, int final, int opcion)
         j++;
         k++;
     }
+}
+
+void lista_enlazada(punto *lista, int inicio, int final, int opcion)
+{
+    
+}
+
+void sublistado(punto *lista, int largo, int coti_x, int coti_y, int cots_x, int cots_y)
+{
+    punto *sub_lista; //calloc(largo)
+    sub_lista=calloc(largo,sizeof(punto));
+    int cont = 0;
+    for (int i = 0; i < largo; i++)
+    {
+        if(lista[i].x > cots_x)
+            break;
+        if (lista[i].x >= coti_x && lista[i].x <= cots_x && lista[i].y >= coti_y && lista[i].y <= cots_y)
+        {
+            sub_lista[cont] = lista[i];
+            cont++;
+        }
+    }
+    imprimir_puntos(sub_lista,cont);
 }
