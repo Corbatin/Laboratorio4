@@ -1,10 +1,10 @@
 
 // Nombres: Alvaro Soto Albornoz - Benjamín Melis Guerra
 // Nombre Profesora: Nicolas Thériault
-// IDE: Visual Studio Code 1.62.3
+// IDE: Visual Studio Code 1.63.2
 // SO: Windows 10
 // Fecha: [REDACTED] de Enero - 2021
-// Este programa genera dos matrices de un orden dado por el usuario y realiza multiplicaciones con dos algoritmos distintos, el algoritmo clasico y la multiplicacion de Strassen
+// Este programa genera y lee archivos con coordenadas  y las ordena segun x o y mediante el algoritmo de mergesort. A
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,46 +13,24 @@
 
 #define NMAX 10000000
 
+// Estructura punte creada para tener coordenadas X y Y juntas
 typedef struct punto
 {
     long x;
     long y;
-    //struct punto *sig;
 } punto;
 
-void generar_archivo(void);
-punto *leer_archivo(int *dim);
-void imprimir_puntos(punto *lista, int largo);
-void menu();
-void merge_sort(punto *lista, int inicio, int final, int opcion);
-void merge(punto *lista, int inicio, int medio, int final, int opcion);
-void lista_enlazada(punto *lista, int inicio, int final, int opcion);
-void sublistado(punto *lista, int largo, int coti_x, int coti_y, int cots_x, int cots_y);
+void generar_archivo(void);                                                                            // Genera archivo con coordendas (X,Y)
+punto *leer_archivo(int *dim);                                                                         // Leearchivo con coordendas (X,Y)
+void imprimir_puntos(punto *lista, int largo);                                                         // Imprime las coordenadas de una lista
+void menu();                                                                                           // Menu
+void merge_sort(punto *lista, int inicio, int final, int opcion);                                      // Algoritmo de ordenamiento para listas
+void merge(punto *lista, int inicio, int medio, int final, int opcion);                                // Complemento de Algoritmo mergesort. Junta las listas
+punto *sublistado(punto *lista, int largo, int coti_x, int coti_y, int cots_x, int cots_y, int *cont); // Imprime un sub listado de coordenadas ordenadas
 
 int main()
 {
-    clock_t Tiempo_1, Tiempo_2;
-    punto *p1;
-    // p1 = calloc(10, sizeof(punto));
-    // for (int i = 0; i < 10; i++)
-    // {
-    //     p1[i].x = i;
-    //     p1[i].y = i + 1;
-    // }
-    // imprimir_puntos(p1, 10);
-    // p1 = calloc(10, sizeof(punto));
-    // for (int i = 0; i < 10; i++)
-    // {
-    //     p1[i].x = rand() % (21);
-    //     p1[i].y = rand() % (21);
-    // }
-    // printf("\nPuntos Iniciales: \n");
-    // imprimir_puntos(p1, 10);
-    // merge_sort(p1, 0, 9, 2);
-    // printf("\nPuntos ordenados: \n");
-    // imprimir_puntos(p1, 10);
     menu();
-    // generar_archivo();
 
     return 0;
 }
@@ -67,21 +45,13 @@ void imprimir_puntos(punto *lista, int largo)
 
 void menu()
 {
-    int op, el, largo, coti_x, coti_y, cots_x, cots_y;
-    punto *lista;
-    char m;
-
-    // printf("\n Inserte el largo de la lista: ");
-    // scanf("%i",&largo);
-    // lista = calloc(largo,sizeof(punto));
-    // for (int i = 0; i < largo; i++)
-    // {
-    //     lista[i].x = rand() % (NMAX);
-    //     lista[i].y = rand() % (NMAX);
-    // }
+    int op, el, largo, coti_x, coti_y, cots_x, cots_y, cont;
+    punto *lista, *sublista;
+    int m;
+    clock_t tiempo_1, tiempo_2;
     do
     {
-        printf("\nQue desea hacer? ");
+        printf("\n\nQue desea hacer? ");
         printf("\n 1)Generar archivo con puntos.");
         printf("\n 2)Leer archivo con puntos.");
         printf("\n 3)Ordenar los puntos segun el valor de sus coordenadas x (S/N)");
@@ -94,34 +64,51 @@ void menu()
         {
         case 1:
             generar_archivo();
-            printf("\nDesea ver tiempo? (s/n)");
-            scanf("%c", &m);
             break;
         case 2:
             lista = leer_archivo(&largo);
-            printf("\nDesea ver tiempo? (s/n)");
-            scanf("%c", &m);
+
             break;
         case 3:
-            printf("\nPuntos Iniciales: \n");
-            imprimir_puntos(lista, largo);
+            tiempo_1 = clock();
             merge_sort(lista, 0, largo - 1, 1); // arreglo,0,largo-1,opcion 1 = x, otra = y
-            printf("\nPuntos ordenados en X: \n");
-            imprimir_puntos(lista, largo);
-            // printf("\nDesea ver tiempo? (s/n)");
-            // scanf("%c", &m);
+            tiempo_2 = clock();
+            printf("\nLista ordenada con exito. tiempo de ejecucion: %f \n", ((double)tiempo_2 - (double)tiempo_1) / ((double)CLOCKS_PER_SEC));
+            printf("\nQuiere ver la lista ordenada? (1 = si / 2 = no): ");
+            scanf("%i", &m);
+            if (m == 1)
+            {
+                printf("\n\nImprimiendo puntos: \n");
+                imprimir_puntos(lista, largo);
+            }
+            else if (m == 2)
+                ;
+            {
+                break;
+            }
             break;
         case 4:
-            printf("\nPuntos Iniciales: \n");
-            imprimir_puntos(lista, largo);
+
+            tiempo_1 = clock();
             merge_sort(lista, 0, largo - 1, 2);
-            printf("\nPuntos ordenados en Y: \n");
-            imprimir_puntos(lista, largo);
-            // printf("\nDesea ver tiempo? (s/n)");
-            // scanf("%c", &m);
+            tiempo_2 = clock();
+            printf("\nLista ordenada con exito. tiempo de ejecucion: %f \n", ((double)tiempo_2 - (double)tiempo_1) / ((double)CLOCKS_PER_SEC));
+            printf("\nQuiere ver la lista ordenada? (1 = si / 2 = no): ");
+            scanf("%i", &m);
+            if (m == 1)
+            {
+                printf("\n\nImprimiendo puntos: \n");
+                imprimir_puntos(lista, largo);
+            }
+            else if (m == 2)
+                ;
+            {
+                break;
+            }
             break;
+
         case 5:
-            merge_sort(lista,0 ,largo - 1, 1);
+            merge_sort(lista, 0, largo - 1, 1);
             printf("\nIngrese cota inferior de X: ");
             scanf("%i", &coti_x);
             printf("\nIngrese cota inferior de Y: ");
@@ -130,12 +117,29 @@ void menu()
             scanf("%i", &cots_x);
             printf("\nIngrese cota superior de Y: ");
             scanf("%i", &cots_y);
-            sublistado(lista, largo, coti_x, coti_y, cots_x, cots_y);
+
+            tiempo_1 = clock();
+            sublista = sublistado(lista, largo, coti_x, coti_y, cots_x, cots_y, &cont);
+            tiempo_2 = clock();
+            printf("\nLista ordenada con exito. tiempo de ejecucion: %f \n", ((double)tiempo_2 - (double)tiempo_1) / ((double)CLOCKS_PER_SEC));
+            printf("\nQuiere ver la lista ordenada? (1 = si / 2 = no): ");
+            scanf("%i", &m);
+            if (m == 1)
+            {
+                printf("\n\nImprimiendo puntos: \n");
+                imprimir_puntos(sublista, cont);
+            }
+            else if (m == 2)
+                ;
+            {
+                break;
+            }
 
             break;
         case 0:
             break;
         default:
+            printf("\nOpcion Ingresada no valida\n");
             break;
         }
     } while (op);
@@ -185,21 +189,19 @@ punto *leer_archivo(int *dim)
         printf("\nSaliendo del programa\n");
         exit(0);
     }
-    printf("\nEscanee el nombre %s\n", nombre_archivo);
-    archivo = fopen(nombre_archivo, "r");
+    archivo = fopen(nombre_archivo, "r"); // abre el archivo para su lectura
     if (archivo == NULL)
     {
         printf("\nSaliendo del programa\n");
         exit(1);
     }
-    fread(p1, sizeof(long), largo, archivo);
-    fscanf(archivo, "%i", &largo);
-    p1 = calloc(largo, sizeof(punto));
-    *dim = largo;
+    fscanf(archivo, "%i", &largo);     // lee la cantidad de datos
+    p1 = calloc(largo, sizeof(punto)); // Se aloca la memoria que se ocuparapara la lista de puntos
+    *dim = largo;                      // Se ocupa dim para poder devolver la cantidad de datos
     i = 0;
     while (i < largo)
     {
-        fscanf(archivo, "%ld %ld", &p1[i].x, &p1[i].y);
+        fscanf(archivo, "%ld %ld", &p1[i].x, &p1[i].y); // Lee cada punto con su X e Y
         i++;
     }
     fclose(archivo);
@@ -212,10 +214,10 @@ void merge_sort(punto *lista, int inicio, int final, int opcion)
     {
         int medio = inicio + (final - inicio) / 2;
 
-        merge_sort(lista, inicio, medio, opcion);
-        merge_sort(lista, medio + 1, final, opcion);
+        merge_sort(lista, inicio, medio, opcion);    // Llama a la funcion mergesort desde el inicio a la mitad del arreglo
+        merge_sort(lista, medio + 1, final, opcion); // Llama a la funcion mergesort desde la mitad + 1 al final del arreglo
 
-        merge(lista, inicio, medio, final, opcion);
+        merge(lista, inicio, medio, final, opcion); // Une los dos sub arreglos
     }
 }
 
@@ -240,7 +242,7 @@ void merge(punto *lista, int inicio, int medio, int final, int opcion)
     i = 0;
     j = 0;
     k = inicio;
-    if (opcion == 1)
+    if (opcion == 1) // La opcion 1 ordena los puntos por la coordenada X
     {
         while (i < largo1 && j < largo2)
         {
@@ -269,7 +271,7 @@ void merge(punto *lista, int inicio, int medio, int final, int opcion)
             k++;
         }
     }
-    else
+    else // mientras que cualquier otra opcion ordena los puntos segun la coordenada Y
         while (i < largo1 && j < largo2)
         {
             if (aux1[i].y <= aux2[j].y)
@@ -296,27 +298,27 @@ void merge(punto *lista, int inicio, int medio, int final, int opcion)
         j++;
         k++;
     }
+    free(aux1);
+    free(aux2); // Se liberan los espacios de memoria alocados
 }
 
-void lista_enlazada(punto *lista, int inicio, int final, int opcion)
+punto *sublistado(punto *lista, int largo, int coti_x, int coti_y, int cots_x, int cots_y, int *cont)
 {
-    
-}
-
-void sublistado(punto *lista, int largo, int coti_x, int coti_y, int cots_x, int cots_y)
-{
-    punto *sub_lista; //calloc(largo)
-    sub_lista=calloc(largo,sizeof(punto));
-    int cont = 0;
+    punto *sub_lista;
+    sub_lista = calloc(largo, sizeof(punto));
+    int contador = 0; // cont se usara para llevar la cuenta del subindice de sub-lista y tambien para tener su largo total
     for (int i = 0; i < largo; i++)
     {
-        if(lista[i].x > cots_x)
+        if (lista[i].x > cots_x) // La lista al estar ordenada por X, si un punto supera esa cota todo el resto tambien lo hara
             break;
+        // Se comprueba que el punto dado este dentro de las cotas especificadas
         if (lista[i].x >= coti_x && lista[i].x <= cots_x && lista[i].y >= coti_y && lista[i].y <= cots_y)
         {
-            sub_lista[cont] = lista[i];
-            cont++;
+            // Se copia el punto de la lista a la sub-lista
+            sub_lista[contador] = lista[i];
+            contador++;
         }
     }
-    imprimir_puntos(sub_lista,cont);
+    *cont = contador; // devuelve el largo de la sub-lista
+    return sub_lista;
 }
