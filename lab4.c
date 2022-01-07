@@ -3,8 +3,8 @@
 // Nombre Profesora: Nicolas Thériault
 // IDE: Visual Studio Code 1.63.2
 // SO: Windows 10
-// Fecha: [REDACTED] de Enero - 2021
-// Este programa genera y lee archivos con coordenadas  y las ordena segun x o y mediante el algoritmo de mergesort. A
+// Fecha: 10 de Enero - 2021
+// Este programa genera y lee archivos con coordenadas y las ordena segun x o y mediante el algoritmo de mergesort.
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,6 +27,7 @@ void menu();                                                                    
 void merge_sort(punto *lista, int inicio, int final, int opcion);                                      // Algoritmo de ordenamiento para listas
 void merge(punto *lista, int inicio, int medio, int final, int opcion);                                // Complemento de Algoritmo mergesort. Junta las listas
 punto *sublistado(punto *lista, int largo, int coti_x, int coti_y, int cots_x, int cots_y, int *cont); // Imprime un sub listado de coordenadas ordenadas
+void escribir_archivo(punto *lista, int dim);                                                          // Funcion para escribir un archivo con los datos ya ordenados.
 
 int main()
 {
@@ -71,18 +72,29 @@ void menu()
             break;
         case 3:
             tiempo_1 = clock();
-            merge_sort(lista, 0, largo - 1, 1); // arreglo,0,largo-1,opcion 1 = x, otra = y
+            merge_sort(lista, 0, largo - 1, 1); 
             tiempo_2 = clock();
             printf("\nLista ordenada con exito. tiempo de ejecucion: %f \n", ((double)tiempo_2 - (double)tiempo_1) / ((double)CLOCKS_PER_SEC));
             printf("\nQuiere ver la lista ordenada? (1 = si / 2 = no): ");
             scanf("%i", &m);
             if (m == 1)
             {
-                printf("\n\nImprimiendo puntos: \n");
-                imprimir_puntos(lista, largo);
+                if (largo > 100)
+                {
+                    printf("\nComo la lista tiene mas de 100 datos, se escribira en un archivo.\n ");
+                    escribir_archivo(lista, largo);
+                }
+                else
+                {
+                    printf("\n\nImprimiendo puntos: \n");
+                    imprimir_puntos(lista, largo);
+                }
             }
             else if (m == 2)
-                ;
+            {
+                break;
+            }
+            else
             {
                 break;
             }
@@ -97,8 +109,16 @@ void menu()
             scanf("%i", &m);
             if (m == 1)
             {
-                printf("\n\nImprimiendo puntos: \n");
-                imprimir_puntos(lista, largo);
+                if (largo > 100)
+                {
+                    printf("\nComo la lista tiene mas de 100 datos, se escribira en un archivo.\n ");
+                    escribir_archivo(lista, largo);
+                }
+                else
+                {
+                    printf("\n\nImprimiendo puntos: \n");
+                    imprimir_puntos(lista, largo);
+                }
             }
             else if (m == 2)
                 ;
@@ -121,13 +141,21 @@ void menu()
             tiempo_1 = clock();
             sublista = sublistado(lista, largo, coti_x, coti_y, cots_x, cots_y, &cont);
             tiempo_2 = clock();
-            printf("\nLista ordenada con exito. tiempo de ejecucion: %f \n", ((double)tiempo_2 - (double)tiempo_1) / ((double)CLOCKS_PER_SEC));
+            printf("\n\nLista ordenada con exito. tiempo de ejecucion: %f \n\n", ((double)tiempo_2 - (double)tiempo_1) / ((double)CLOCKS_PER_SEC));
             printf("\nQuiere ver la lista ordenada? (1 = si / 2 = no): ");
             scanf("%i", &m);
             if (m == 1)
             {
-                printf("\n\nImprimiendo puntos: \n");
-                imprimir_puntos(sublista, cont);
+                if (largo >= 100)
+                {
+                    printf("\nComo la lista tiene mas de 100 datos, se escribira en un archivo.\n ");
+                    escribir_archivo(sublista, cont);
+                }
+                else
+                {
+                    printf("\n\nImprimiendo puntos: \n");
+                    imprimir_puntos(sublista, cont);
+                }
             }
             else if (m == 2)
                 ;
@@ -175,12 +203,34 @@ void generar_archivo(void)
     printf("El archivo esta listo.\n");
 }
 
+void escribir_archivo(punto *lista, int dim)
+{
+    long i;
+    FILE *archivo;
+    char nombre_archivo[30];
+    printf("Ingresar nombre de archivo: ");
+    scanf("%s", nombre_archivo);
+
+    while (getchar() != '\n')
+        ;
+    archivo = fopen(nombre_archivo, "w");
+    fprintf(archivo, "%i \n", dim);
+    for (i = 0; i < dim; i++)
+    {
+        fprintf(archivo, "%ld ", lista[i].x);
+        fprintf(archivo, "%ld ", lista[i].y);
+        fprintf(archivo, "\n");
+    }
+    fclose(archivo);
+    printf("El archivo esta listo.\n");
+}
+
 punto *leer_archivo(int *dim)
 {
     punto *p1;
     long largo;
-    int i;
-    FILE *archivo;
+    int i;         // contador
+    FILE *archivo; // variable archivo
     char nombre_archivo[30];
     printf("\nIngrese el nombre del archivo\n ");
     scanf("%s", &nombre_archivo);
